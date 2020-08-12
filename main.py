@@ -2,10 +2,10 @@
 # Imports - use pip install {pywinauto, numpy, scipy, pandas} in the Terminal to gain access
 from pywinauto import Application
 import numpy as np
-import pandas as pa
+import pandas as pd
 from scipy import sparse
 from scipy.sparse.linalg import spsolve
-import os
+import os, time
 
 
 # Baseline Removal Algorithm - P. Eilers 2005, returns baseline (z). Could update to use sparse matrices (sparse.diags)
@@ -45,6 +45,7 @@ def importFile(new):
 
 # Save session
 def saveSession(save):
+    time.sleep(1)
     app.Dialog.menu_select(r'Session -> Save Session')
     app.Dialog.ComboBox.type_keys(save, with_spaces=True)
     app.Dialog['Save'].click()
@@ -61,6 +62,8 @@ def clean(df):
     df = df.reset_index(drop=True)
     return df
 
+# Ask user for Fityk path
+fityk = input("Enter exact path to Fityk:")
 
 # Ask user for Data folder path
 primary = input(r"Enter exact data folder path (Ex: C:\Users\...):")
@@ -68,17 +71,14 @@ primary = input(r"Enter exact data folder path (Ex: C:\Users\...):")
 # Ask user for folder name
 folder = "\\" + input("Which folder do I sort through?:")
 
-# Ask user for Fityk path
-fityk = input("Enter exact path to Fityk:")
-
-# Ask user for file version
-version = input("Enter an underscore (_) followed by the file version (Ex: V1, V2, etc.):")
-
 # Path to no baseline save folder:
 save_csv = input("Enter exact path to save folder for baseline-corrected CSVs")
 
 # Path to fityk save folder:
 save_fityk = input("Enter exact path to save folder for fityk sessions")
+
+# Ask user for file version
+version = input("Enter an underscore (_) followed by the file version (Ex: V1, V2, etc.):")
 
 # Open Fityk
 app = Application(backend='uia').start(fityk)
@@ -92,7 +92,7 @@ for filename in os.listdir(directory):
         # read in and clean raw CSV
         file = filename.replace('.csv', '')
         original_file = directory + "\\" + filename
-        original_data = pa.read_csv(original_file, header=None)
+        original_data = pd.read_csv(original_file, header=None)
         clean_data = clean(original_data)
         data = clean_data['%T']
 
@@ -105,7 +105,7 @@ for filename in os.listdir(directory):
         # arrange processed CSV
         wvnmbr = clean_data['cm-1']
         new_file_name = save_csv + "\\" + file + '_NOBSLINE.csv'
-        new_file = pa.DataFrame()
+        new_file = pd.DataFrame()
         new_file.insert(0, "cm-1", wvnmbr, True)
         new_file.insert(1, "%T", new_data, True)
         new_file.to_csv(new_file_name, index=False)
