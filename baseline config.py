@@ -40,13 +40,13 @@ def clean(df):
     return df
 
 # Ask user for Fityk path
-fityk = input("Enter exact path to Fityk:")
+fityk = input("Enter exact path to Fityk: ")
 
 # Path to no baseline save folder:
-save_csv = input("Enter exact path to save location for baseline-corrected CSV")
+save_csv = input("Enter exact path to save location for baseline-corrected CSV: ")
 
 #Path to test file:
-test_csv = input("Enter exact path to test CSV file, including file name")
+test_csv = input("Enter exact path to test CSV file, including file name and .csv: ")
 test_csv_data = pa.read_csv(test_csv, header=None)
 clean_test_csv_data = clean(test_csv_data)
 data = clean_test_csv_data['%T']
@@ -60,11 +60,10 @@ config = 0
 
 while config==0:
     # Config baseline correction
-    lm = float(input("Enter lambda value (smoothness parameter) for baseline correction:"))
-    p = float(input("Enter p value (asymmetry parameter) for baseline correction"))
+    lm = float(input("Enter lambda value (smoothness parameter) for baseline correction: "))
+    p = float(input("Enter p value (asymmetry parameter) for baseline correction: "))
 
     # calculate baseline
-    # 7500000, 0.00003
     base = baseline_als(data, lm, p)
 
     # subtract baseline
@@ -81,7 +80,7 @@ while config==0:
 
     #check w/ User:
     print('lambda: ' + str(lm) + ' p: ' + str(p))
-    is_config = input("Are these parameters final? (type True or False)")
+    is_config = input("Are these parameters final? (type True or False): ")
 
     if(is_config == 'True'):
         config=1

@@ -63,22 +63,26 @@ def clean(df):
     return df
 
 # Ask user for Fityk path
-fityk = input("Enter exact path to Fityk:")
+fityk = input("Enter exact path to Fityk: ")
 
 # Ask user for Data folder path
-primary = input(r"Enter exact data folder path (Ex: C:\Users\...):")
+primary = input(r"Enter exact data folder path (Ex: C:\Users\...): ")
 
 # Ask user for folder name
-folder = "\\" + input("Which folder do I sort through?:")
+folder = "\\" + input("Which folder do I sort through?: ")
 
 # Path to no baseline save folder:
-save_csv = input("Enter exact path to save folder for baseline-corrected CSVs")
+save_csv = input("Enter exact path to save folder for baseline-corrected CSVs: ")
 
 # Path to fityk save folder:
-save_fityk = input("Enter exact path to save folder for fityk sessions")
+save_fityk = input("Enter exact path to save folder for fityk sessions: ")
 
 # Ask user for file version
-version = input("Enter an underscore (_) followed by the file version (Ex: V1, V2, etc.):")
+version = input("Enter an underscore (_) followed by the file version (Ex: V1, V2, etc.): ")
+
+# Config baseline correction
+lm = float(input("Enter lambda value (smoothness parameter) for baseline correction: "))
+p = float(input("Enter p value (asymmetry parameter) for baseline correction: "))
 
 # Open Fityk
 app = Application(backend='uia').start(fityk)
@@ -97,7 +101,7 @@ for filename in os.listdir(directory):
         data = clean_data['%T']
 
         # calculate baseline
-        base = baseline_als(data, 7500000, 0.00003)
+        base = baseline_als(data, lm, p)
 
         # subtract baseline
         new_data = data - base
