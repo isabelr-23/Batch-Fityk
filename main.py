@@ -87,40 +87,62 @@ p = float(input("Enter p value (asymmetry parameter) for baseline correction: ")
 # Open Fityk
 app = Application(backend='uia').start(fityk)
 
-# Path to folder where raw CSV files are held:
-directory = primary + folder
+sorted = 0
 
+while sorted==0:
+    # Path to folder where raw CSV files are held:
+    directory = primary + folder
 
-for filename in os.listdir(directory):
-    if filename.endswith('.csv'):
-        # read in and clean raw CSV
-        file = filename.replace('.csv', '')
-        original_file = directory + "\\" + filename
-        original_data = pd.read_csv(original_file, header=None)
-        clean_data = clean(original_data)
-        data = clean_data['%T']
+    for filename in os.listdir(directory):
+        if filename.endswith('.csv'):
+            # read in and clean raw CSV
+            file = filename.replace('.csv', '')
+            original_file = directory + "\\" + filename
+            original_data = pd.read_csv(original_file, header=None)
+            clean_data = clean(original_data)
+            data = clean_data['%T']
 
-        # calculate baseline
-        base = baseline_als(data, lm, p)
+            # calculate baseline
+            base = baseline_als(data, lm, p)
 
-        # subtract baseline
-        new_data = data - base
+            # subtract baseline
+            new_data = data - base
 
-        # arrange processed CSV
-        wvnmbr = clean_data['cm-1']
-        new_file_name = save_csv + "\\" + file + '_NOBSLINE.csv'
-        new_file = pd.DataFrame()
-        new_file.insert(0, "cm-1", wvnmbr, True)
-        new_file.insert(1, "%T", new_data, True)
-        new_file.to_csv(new_file_name, index=False)
+            # arrange processed CSV
+            wvnmbr = clean_data['cm-1']
+            new_file_name = save_csv + "\\" + file + '_NOBSLINE.csv'
+            new_file = pd.DataFrame()
+            new_file.insert(0, "cm-1", wvnmbr, True)
+            new_file.insert(1, "%T", new_data, True)
+            new_file.to_csv(new_file_name, index=False)
 
-        importFile(new_file_name)
+            importFile(new_file_name)
 
-        save_session_name = save_fityk + "\\" + file + version + '.fit'
-        saveSession(save_session_name)
+            save_session_name = save_fityk + "\\" + file + version + '.fit'
+            saveSession(save_session_name)
 
-        # Replace Data
-        app.Dialog.menu_select(r'Session -> Reset')
+            # Replace Data
+            app.Dialog.menu_select(r'Session -> Reset')
 
-    else:
-        continue
+        else:
+            continue
+
+        is_sorted = input("Do you want to sort through any other folders? (Type Yes or No): ")
+        if is_sorted == 'Yes':
+            sorted = 1
+        else:
+            # Ask user for folder name
+            folder = "\\" + input("Which folder do I sort through?: ")
+
+            # Path to no baseline save folder:
+            save_csv = input("Enter exact path to save folder for baseline-corrected CSVs: ")
+
+            # Path to fityk save folder:
+            save_fityk = input("Enter exact path to save folder for fityk sessions: ")
+
+            # Ask user for file version
+            version = input("Enter an underscore (_) followed by the file version (Ex: V1, V2, etc.): ")
+
+            # Config baseline correction
+            lm = float(input("Enter lambda value (smoothness parameter) for baseline correction: "))
+            p = float(input("Enter p value (asymmetry parameter) for baseline correction: "))

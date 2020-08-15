@@ -80,9 +80,9 @@ while config==0:
 
     #check w/ User:
     print('lambda: ' + str(lm) + ' p: ' + str(p))
-    is_config = input("Are these parameters final? (type True or False): ")
+    is_config = input("Are these parameters final? (type Yes or No): ")
 
-    if(is_config == 'True'):
+    if(is_config == 'Yes'):
         config=1
     else:
         # Replace Data
